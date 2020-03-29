@@ -20,7 +20,49 @@
         android:id="@+id/guideline_cameraActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
+        android:layout_below="@+id/instructions"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
+
+        <SurfaceView
+            android:id="@+id/preview"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"></SurfaceView>
+
+        <ProgressBar
+            android:id="@+id/view_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="30dp"
+            android:progressDrawable="@drawable/circular_progress_bar" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_timer"
+            android:layout_centerInParent="true"
+            />
+
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="fill_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:orientation="vertical" >-->
+
+        <!--            <Button-->
+        <!--                android:id="@+id/mybutton"-->
+        <!--                android:layout_width="fill_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:text="REC"-->
+        <!--                android:textSize="12dp" />-->
+=======
         android:orientation="horizontal"
+>>>>>>> origin/mergeWithCamera
 
         app:layout_constraintGuide_percent="0.2" />
 

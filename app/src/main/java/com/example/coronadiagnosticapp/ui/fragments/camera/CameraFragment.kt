@@ -124,6 +124,9 @@ class CameraFragment : ScopedFragment() {
 //                            findNavController().navigate(R.id.action_cameraFragment_to_recorderFragment)
 //                        }
 //                    }
+<<<<<<< HEAD
+                    Toast.makeText(context, "Result O2: "+ data.getStringExtra("result_o2") + "Result BPM = " +data.getStringExtra("result_bpm"), Toast.LENGTH_SHORT).show();
+=======
 
                     showLoading(true)
                     // get data from OxymeterActivity
@@ -150,6 +153,7 @@ class CameraFragment : ScopedFragment() {
                         "Result: " + data.getStringExtra("result"),
                         Toast.LENGTH_SHORT
                     ).show()
+>>>>>>> origin/mergeWithCamera
 
                 }
             } else {
