@@ -1,13 +1,15 @@
 package com.example.coronadiagnosticapp.ui.activities;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Bundle;
+<<<<<<< HEAD
 import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.text.TextUtils;
+=======
+>>>>>>> origin/mergeWithCamera
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -15,7 +17,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +32,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.example.coronadiagnosticapp.R;
 import com.example.coronadiagnosticapp.ui.activities.Math.Fft;
 import com.example.coronadiagnosticapp.ui.activities.Math.Fft2;
+<<<<<<< HEAD
 import com.opencsv.CSVWriter;
 
 import retrofit2.http.HEAD;
+=======
+import com.example.coronadiagnosticapp.ui.fragments.camera.CameraFragment;
+>>>>>>> origin/mergeWithCamera
 
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 import static java.lang.Math.ceil;
@@ -264,6 +269,7 @@ public class OxymeterActivity extends Activity {
             GreenAvgList.add(GreenAvg);
 
             //To check if we got a good red intensity to process if not return to the condition and set it again until we get a good red intensity
+<<<<<<< HEAD
             if (RedAvg < 200) {
                 alert.setVisibility(View.VISIBLE); // Make alert no finger - visible
                 sumred = 0;
@@ -271,6 +277,13 @@ public class OxymeterActivity extends Activity {
                 RedAvgList.clear();
                 BlueAvgList.clear();
                 counter =0;
+=======
+            if (RedAvg < 150) {
+                alert.setVisibility(View.VISIBLE);
+//                inc=0;
+//                ProgP=inc;
+//                ProgO2.setProgress(ProgP);
+>>>>>>> origin/mergeWithCamera
                 processing.set(false);
                 countDownTimer.cancel();
                 setProgress(0,30);
@@ -452,14 +465,25 @@ public class OxymeterActivity extends Activity {
                 camera.stopPreview();
             }
 
+<<<<<<< HEAD
 
             if ((Beats != 0)  && (o2 != 0) && (Breath != 0 ) && (peakBpm != 0)) {
+=======
+            if ((Beats != 0) && (o2 != 0) && (Breath != 0)) {
+>>>>>>> origin/mergeWithCamera
                 Intent returnIntent = new Intent();
                 if (!(o2 < 80 || o2 > 99) && !(Beats <45 || Beats > 200) && !(peakBpm<45 || peakBpm>200)) {
                 int BpmAvg = (int)ceil((Beats + peakBpm) /2);
                 //TODO Need to pass Bats o2 and Breath
+<<<<<<< HEAD
                 returnIntent.putExtra("result_o2", Integer.toString(o2));
                 returnIntent.putExtra("result_bpm",Integer.toString(BpmAvg));
+=======
+
+                returnIntent.putExtra(CameraFragment.CameraCodes.oxygenSaturation(), Integer.toString(o2));
+                returnIntent.putExtra(CameraFragment.CameraCodes.beatsPerMinuteKey(), Integer.toString(Beats));
+                returnIntent.putExtra(CameraFragment.CameraCodes.breathsPerMinute(), Integer.toString(Breath));
+>>>>>>> origin/mergeWithCamera
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
                 }
