@@ -15,14 +15,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.example.coronadiagnosticapp.R;
+import com.example.coronadiagnosticapp.ui.activities.Math.Butterworth;
 import com.example.coronadiagnosticapp.ui.activities.Math.Fft;
 import com.example.coronadiagnosticapp.ui.activities.Math.Fft2;
 import com.example.coronadiagnosticapp.ui.fragments.camera.CameraFragment;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
 
 public class OxymeterActivity extends Activity {
@@ -90,6 +95,7 @@ public class OxymeterActivity extends Activity {
         previewHolder.addCallback(surfaceCallback);
         previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
+
         readyBtn = (Button) findViewById(R.id.ready_btn);
 
         readyBtn.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +134,6 @@ public class OxymeterActivity extends Activity {
         super.onResume();
 
         camera = Camera.open();
-
         camera.setDisplayOrientation(90);
 
 //        startTime = System.currentTimeMillis();
@@ -188,7 +193,7 @@ public class OxymeterActivity extends Activity {
             GreenAvgList.add(GreenAvg);
 
             //To check if we got a good red intensity to process if not return to the condition and set it again until we get a good red intensity
-            if (RedAvg < 150) {
+            if (RedAvg < 180 ) {
                 alert.setVisibility(View.VISIBLE);
 //                inc=0;
 //                ProgP=inc;
@@ -208,14 +213,33 @@ public class OxymeterActivity extends Activity {
             double totalTimeInSecs = (endTime - startTime) / 1000d; //to convert time to seconds
             if (totalTimeInSecs >= 30 && startTime != 0) { //when 30 seconds of measuring passes do the following " we chose 30 seconds to take half sample since 60 seconds is normally a full sample of the heart beat
 
+
                 startTime = System.currentTimeMillis();
                 SamplingFreq = (counter / totalTimeInSecs);
                 Double[] Red = RedAvgList.toArray(new Double[RedAvgList.size()]);
                 Double[] Blue = BlueAvgList.toArray(new Double[BlueAvgList.size()]);
                 Double[] Green = GreenAvgList.toArray(new Double[GreenAvgList.size()]);
 
+                /*Red = Arrays.copyOfRange(Red, (int)(SamplingFreq*5), counter );
+                Blue = Arrays.copyOfRange(Blue, (int)(SamplingFreq*5), counter );
+                Green = Arrays.copyOfRange(Green, (int)(SamplingFreq*5), counter );
+                counter = (int)(counter - SamplingFreq*5);*/
+
+
                 // double HRFreq = Fft.FFT(Red, counter, SamplingFreq);
                 // double bpm = (int) ceil(HRFreq * 60);
+
+                /*Butterworth butterworth = new Butterworth();
+                butterworth.bandPass(2,SamplingFreq,0.2,0.1);
+
+                for (int i =0; i<Red.length; i++){
+                    Red[i] = butterworth.filter(Red[i]);
+                    Blue[i] = butterworth.filter(Blue[i]);
+                    Green[i] = butterworth.filter(Green[i]);
+                }*/
+
+
+
                 double HRFreq = Fft.FFT(Green, counter, SamplingFreq);
                 double bpmGreen = (int) ceil(HRFreq * 60);
                 double HR1Freq = Fft.FFT(Red, counter, SamplingFreq);
@@ -226,7 +250,10 @@ public class OxymeterActivity extends Activity {
                 double RR1Freq = Fft2.FFT(Red, counter, SamplingFreq);
                 double breathRed = (int) ceil(RR1Freq * 60);
 
+                String redString = Arrays.toString(Red);
+
                 double meanr = sumred / counter;
+
                 double meanb = sumblue / counter;
 
                 for (int i = 0; i < counter - 1; i++) {
@@ -269,7 +296,7 @@ public class OxymeterActivity extends Activity {
                 o2 = (int) (spo2);
                 Log.e("O2 Value = ", "" + Integer.toString(o2));
 //-----------------Measurement failed, doing start-over by setting counter to 0 and setting startTime to current---------------------------------------------//
-                if ((o2 < 80 || o2 > 99) || (bufferAvgB < 45 || bufferAvgB > 200)) {
+                if ((o2 < 80 || o2 > 99) || (bufferAvgB < 30 || bufferAvgB > 200)) {
 //                    inc=0;
 //                    ProgP=inc;
 //                    ProgO2.setProgress(ProgP);
@@ -307,6 +334,89 @@ public class OxymeterActivity extends Activity {
         }
     };
 
+    /*private double calculateHeartBeat(double[] Red, Double samplingFreq) {
+        double windowRatio = 0.75
+        int windowSize = (int) windowRatio * samplingFreq
+        DescriptiveStatistics stats = new DescriptiveStatistics(Red);
+        stats.setWindowSize(windowSize);
+        stats.getMean()
+    }
+
+    private getHeartBeat(Array<Double> ): Double{
+        int imgAvg = ImageProcessing.decodeYUV420SPtoRedAvg(data.clone(), height, width);
+        // Log.i(TAG, "imgAvg="+imgAvg);
+        if (imgAvg == 0 || imgAvg == 255) {
+            processing.set(false);
+            return;
+        }
+
+        int averageArrayAvg = 0;
+        int averageArrayCnt = 0;
+            for (int i = 0; i < averageArray.length; i++) {
+            if (averageArray[i] > 0) {
+                averageArrayAvg += averageArray[i];
+                averageArrayCnt++;
+            }
+        }
+
+        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+        TYPE newType = currentType;
+        if (imgAvg < rollingAverage) {
+            newType = TYPE.RED;
+            if (newType != currentType) {
+                beats++;
+                // Log.d(TAG, "BEAT!! beats="+beats);
+            }
+        } else if (imgAvg > rollingAverage) {
+            newType = TYPE.GREEN;
+        }
+
+        if (averageIndex == averageArraySize) averageIndex = 0;
+        averageArray[averageIndex] = imgAvg;
+        averageIndex++;
+
+        // Transitioned from one state to another to the same
+        if (newType != currentType) {
+            currentType = newType;
+            image.postInvalidate();
+        }
+
+        long endTime = System.currentTimeMillis();
+        double totalTimeInSecs = (endTime - startTime) / 1000d;
+        if (totalTimeInSecs >= 10) {
+            double bps = (beats / totalTimeInSecs);
+            int dpm = (int) (bps * 60d);
+            if (dpm < 30 || dpm > 180) {
+                startTime = System.currentTimeMillis();
+                beats = 0;
+                processing.set(false);
+                return;
+            }
+
+            // Log.d(TAG,
+            // "totalTimeInSecs="+totalTimeInSecs+" beats="+beats);
+
+            if (beatsIndex == beatsArraySize) beatsIndex = 0;
+            beatsArray[beatsIndex] = dpm;
+            beatsIndex++;
+
+            int beatsArrayAvg = 0;
+            int beatsArrayCnt = 0;
+            for (int i = 0; i < beatsArray.length; i++) {
+                if (beatsArray[i] > 0) {
+                    beatsArrayAvg += beatsArray[i];
+                    beatsArrayCnt++;
+                }
+            }
+            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
+            text.setText(String.valueOf(beatsAvg));
+            startTime = System.currentTimeMillis();
+            beats = 0;
+        }
+        processing.set(false);
+    }
+    }*/
+
     private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
 
@@ -326,7 +436,21 @@ public class OxymeterActivity extends Activity {
             Log.e("surfaceChanged:", "OK");
             Camera.Parameters parameters = camera.getParameters();
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_FIXED);
 
+            if (parameters.isAutoExposureLockSupported()) {
+                parameters.setAutoExposureLock(true);
+            }
+
+            if (parameters.isAutoWhiteBalanceLockSupported()) {
+                parameters.setAutoWhiteBalanceLock(true);
+            }
+            /*
+            parameters.setAntibanding(Camera.Parameters.ANTIBANDING_OFF);
+            parameters.setColorEffect(Camera.Parameters.EFFECT_NONE);
+            parameters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
+            //parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_INCANDESCENT);*/
 
             Camera.Size size = getSmallestPreviewSize(width, height, parameters);
             if (size != null) {
@@ -372,3 +496,5 @@ public class OxymeterActivity extends Activity {
 //        finish();
     }
 }
+
+

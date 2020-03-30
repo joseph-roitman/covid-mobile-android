@@ -8,14 +8,18 @@ public abstract class ImageProcessing {
         if (yuv420sp == null) return 0;
 
         final int frameSize = width * height;
-
-        int sum=0;
+        int height_cut_start = 0;//(int) (height * 0.25);
+        int height_cut_fin = height;//(int) (height * 0.75);
+        int width_cut_start = 0;//(int) (0.25 * width);
+        int width_cut_fin = width;//(int) (0.75 * width);
+        int sum = 0;
         int sumr = 0;
         int sumg = 0;
         int sumb = 0;
-        for (int j = 0, yp = 0; j < height; j++) {
+        int initial_yp = height_cut_start * width + width_cut_start;
+        for (int j = height_cut_start, yp = initial_yp; j < height_cut_fin; j++) {
             int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
-            for (int i = 0; i < width; i++, yp++) {
+            for (int i = width_cut_start; i < width_cut_fin; i++, yp++) {
                 int y = (0xff & yuv420sp[yp]) - 16;
                 if (y < 0) y = 0;
                 if ((i & 1) == 0) {
@@ -37,18 +41,22 @@ public abstract class ImageProcessing {
                 int pixel = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
                 int red = (pixel >> 16) & 0xff;
                 int green = (pixel >> 8) & 0xff;
-                int blue = pixel&0xff;
+                int blue = pixel & 0xff;
                 sumr += red;
-                sumg +=green;
-                sumb +=blue;
+                sumg += green;
+                sumb += blue;
             }
+            yp += width_cut_start;
         }
-        switch(type){
-            case (1): sum =sumr;
+        switch (type) {
+            case (1):
+                sum = sumr;
                 break;
-            case (2): sum =sumb;
+            case (2):
+                sum = sumb;
                 break;
-            case (3): sum =sumg;
+            case (3):
+                sum = sumg;
                 break;
         }
         return sum;
@@ -58,12 +66,9 @@ public abstract class ImageProcessing {
      * Given a byte array representing a yuv420sp image, determine the average
      * amount of red in the image. Note: returns 0 if the byte array is NULL.
      *
-     * @param yuv420sp
-     *            Byte array representing a yuv420sp image
-     * @param width
-     *            Width of the image.
-     * @param height
-     *            Height of the image.
+     * @param yuv420sp Byte array representing a yuv420sp image
+     * @param width    Width of the image.
+     * @param height   Height of the image.
      * @return int representing the average amount of red in the image.
      */
     public static double decodeYUV420SPtoRedBlueGreenAvg(byte[] yuv420sp, int width, int height, int type) {
@@ -71,7 +76,7 @@ public abstract class ImageProcessing {
         final int frameSize = width * height;
 
         int sum = decodeYUV420SPtoRedBlueGreenSum(yuv420sp, width, height, type);
-        int mean = (sum / frameSize);
+        double mean = ((double) sum / (double) frameSize);
 
         return mean;
     }
