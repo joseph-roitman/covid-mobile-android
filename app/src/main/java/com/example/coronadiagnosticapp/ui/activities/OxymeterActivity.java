@@ -229,14 +229,14 @@ public class OxymeterActivity extends Activity {
                 // double HRFreq = Fft.FFT(Red, counter, SamplingFreq);
                 // double bpm = (int) ceil(HRFreq * 60);
 
-                /*Butterworth butterworth = new Butterworth();
-                butterworth.bandPass(2,SamplingFreq,0.2,0.1);
+                Butterworth butterworth = new Butterworth();
+                butterworth.bandPass(10,SamplingFreq,1.2,1);
 
                 for (int i =0; i<Red.length; i++){
                     Red[i] = butterworth.filter(Red[i]);
                     Blue[i] = butterworth.filter(Blue[i]);
                     Green[i] = butterworth.filter(Green[i]);
-                }*/
+                }
 
 
 
